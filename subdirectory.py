@@ -65,7 +65,7 @@ def find_file(file, l, level):
     l[str(file.resolve())]=Item(file.parent, str(file.name), level, "file", file.stat().st_size, 0, check_file_name(file))
 
 def goto_parent_folder(folder, l):
-    # フォルダ内のファイル、フォルダのsizeを合計する。
+    # get total size and file count undor the folder
     total_size=0
     total_file_count=0
     for file in folder.iterdir():
@@ -75,24 +75,21 @@ def goto_parent_folder(folder, l):
         elif file.is_file():
             total_file_count+=1
 
-    # 合計値をフォルダのサイズに加算する。
     l[str(folder)].add_total_size(total_size)
-    # 合計値をフォルダのファイル数に加算する。
     l[str(folder)].add_total_file_count(total_file_count)
 
 def look_into_the_folder(path, l, level):
     p = Path(path)
     find_folder(p, l, level)
 
-    # 指定されたパス以下のファイルを再帰的にチェックする
+    # recursive search
     for file in p.iterdir():
-        if file.is_dir(): # フォルダのケース
-            # 子フォルダへ
+        if file.is_dir():
             look_into_the_folder(file, l, level+1)
-        elif file.is_file(): # ファイルのケース
+        elif file.is_file():
             find_file(file, l, level+1)
     
-    # フォルダ内の探索が終わり親フォルダへ
+    # after search in this path
     goto_parent_folder(p, l)
 
 def subdirecory(path):
