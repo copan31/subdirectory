@@ -3,30 +3,33 @@ from pathlib import Path
 import csv
 
 class Item():
-    def __init__(self, path, name, level, type, size, file_count):
+    def __init__(self, path, name, level, type, total_size, total_file_count):
         self.path=path
         self.name=name
         self.level=level
         self.type=type
-        self.size=size
-        self.file_count=file_count
+        self.total_size=total_size
+        self.total_file_count=total_file_count
     
     @classmethod
     def head(cls):
-        return ["path", "name", "level", "type", "size", "file_count"]
+        return ["パス", "名称", "タイプ", "階層", "総サイズ", "総ファイル数"]
     
     def __str__(self):
-        return ",".join([str(self.path), str(self.name), str(self.level), str(self.type), str(self.size), str(self.file_count)])
+        return ",".join([str(self.path), str(self.name), str(self.type), str(self.level), str(self.total_size), str(self.total_file_count)])
 
     def list(self):
-        return [str(self.path), str(self.name), str(self.level), str(self.type), str(self.size), str(self.file_count)]
+        return [str(self.path), str(self.name), str(self.type), str(self.level), str(self.total_size), str(self.total_file_count)]
 
-    def add_size(self, size):
-        self.size+=size
+    def add_total_size(self, total_size):
+        self.total_size+=total_size
+    
+    def add_total_file_count(self, total_file_count):
+        self.total_file_count+=total_file_count
 
 def find_folder(folder, l, level):
     #print("down: " + str(folder))
-    l[str(folder)]=Item(folder.parent, str(folder.name), level, "folder", 0, len([file for file in folder.iterdir()]))
+    l[str(folder)]=Item(folder.parent, str(folder.name), level, "folder", 0, 0)
 
 def find_file(file, l, level):
     l[str(file.resolve())]=Item(file.parent, str(file.name), level, "file", file.stat().st_size, 0)
@@ -34,12 +37,18 @@ def find_file(file, l, level):
 def goto_parent_folder(folder, l):
     # フォルダ内のファイル、フォルダのsizeを合計する。
     total_size=0
+    total_file_count=0
     for file in folder.iterdir():
-        item=l[str(file)]
-        total_size+=item.size
+        total_size+=l[str(file)].total_size
+        if file.is_dir():  
+            total_file_count+=l[str(file)].total_file_count
+        elif file.is_file():
+            total_file_count+=1
 
     # 合計値をフォルダのサイズに加算する。
-    item=l[str(folder)].add_size(total_size)
+    l[str(folder)].add_total_size(total_size)
+    # 合計値をフォルダのファイル数に加算する。
+    l[str(folder)].add_total_file_count(total_file_count)
 
 def search_files(path, l, level):
     p = Path(path)
