@@ -33,24 +33,28 @@ class Item():
         self.total_file_count+=file_count
 
 def check_folder_name(folder):
+    error_info=[]
+
     is_invalid=False
     for c in r"~\"#%&*:<>?/\{|}.":
         if c in folder.name:
             is_invalid=True
     
     if is_invalid:
-        return "INVALID_NAME"
-    else:
-        return "NONE"
+        error_info.append("INVALID_NAME")
+
+    return error_info
 
 def check_file_name(file):
+    error_info=[]
+
     # check the file name except for the file extension
     is_invalid=False
     for c in r"~\"#%&*:<>?/\{|}.":
         if c in file.stem:
             is_invalid=True
     if is_invalid:
-        return "INVALID_NAME"
+        error_info.append("INVALID_NAME")
     
     # check the file extension 
     is_invalid=False
@@ -58,15 +62,17 @@ def check_file_name(file):
         if c in file.suffix:
             is_invalid=True
     if is_invalid:
-        return "iNVALID_EXTENSION"
+        error_info.append("iNVALID_EXTENSION")
     
-    return "NONE"
+    return error_info
 
 def find_folder(folder, l, level):
-    l[str(folder)]=Item(folder.parent, str(folder.name), level, "folder", 0, 0, check_folder_name(folder))
+    error_info=check_folder_name(folder)
+    l[str(folder)]=Item(folder.parent, str(folder.name), level, "folder", 0, 0, error_info)
 
 def find_file(file, l, level):
-    l[str(file.resolve())]=Item(file.parent, str(file.name), level, "file", file.stat().st_size, 0, check_file_name(file))
+    error_info=check_file_name(file)
+    l[str(file.resolve())]=Item(file.parent, str(file.name), level, "file", file.stat().st_size, 0, error_info)
 
 def goto_parent_folder(folder, l):
     # get total size and file count undor the folder
