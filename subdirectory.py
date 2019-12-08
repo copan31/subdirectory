@@ -110,7 +110,10 @@ def subdirecory(path):
         writer=csv.writer(f)
         writer.writerow(Item.head())
         for item in l.values():
-            writer.writerow(item.list())
+            try:
+                writer.writerow(item.list())
+            except Exception as e:
+                print("error: {e}, item: {item}".format(e=e, item=item))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="This program looks into the folder. And then, it outputs a csv file that include folder info and file info.")
