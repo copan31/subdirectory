@@ -1,7 +1,9 @@
 # coding: utf-8
 from pathlib import Path
 import argparse
+#import unicodecsv as csv
 import csv
+import datetime
 import re
 
 class Item():
@@ -42,7 +44,7 @@ def check_folder_name(folder):
         return "NONE"
 
 def check_file_name(file):
-    # check for the file name except for the file extension
+    # check the file name except for the file extension
     is_invalid=False
     for c in r"~\"#%&*:<>?/\{|}.":
         if c in file.stem:
@@ -50,12 +52,14 @@ def check_file_name(file):
     if is_invalid:
         return "INVALID_NAME"
     
+    # check the file extension 
+    is_invalid=False
     for c in r"":
         if c in file.suffix:
             is_invalid=True
     if is_invalid:
         return "iNVALID_EXTENSION"
-
+    
     return "NONE"
 
 def find_folder(folder, l, level):
@@ -75,12 +79,15 @@ def goto_parent_folder(folder, l):
         elif file.is_file():
             total_file_count+=1
 
-    l[str(folder)].add_total_size(total_size)
-    l[str(folder)].add_total_file_count(total_file_count)
+    item=l[str(folder)]
+    item.add_total_size(total_size)
+    item.add_total_file_count(total_file_count)
 
 def look_into_the_folder(path, l, level):
     p = Path(path)
     find_folder(p, l, level)
+    if(level==1):
+        print("Search start: " + str(path))
 
     # recursive search
     for file in p.iterdir():
@@ -97,7 +104,9 @@ def subdirecory(path):
     look_into_the_folder(path, l, 0)
     
     # output a csv file
-    with open("result.csv", "w", newline="") as f:
+    now = datetime.datetime.now()
+    filename = './result_' + now.strftime('%Y%m%d_%H%M%S') + '.csv'
+    with open(filename, "w", newline="", encoding='UTF-8') as f:
         writer=csv.writer(f)
         writer.writerow(Item.head())
         for item in l.values():
