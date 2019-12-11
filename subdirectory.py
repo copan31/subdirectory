@@ -71,10 +71,10 @@ class Item():
         if is_invalid:
             self.error_info.append("INVALID_NAME")
 
-def find_folder(folder, l, level):
+def folder_found(folder, l, level):
     l[str(folder)]=Item(folder.parent, str(folder.name), level, "folder", 0, 0)
 
-def find_file(file, l, level):
+def file_found(file, l, level):
     l[str(file.resolve())]=Item(file.parent, str(file.name), level, "file", file.stat().st_size, 0)
 
 def goto_parent_folder(folder, l):
@@ -93,20 +93,23 @@ def goto_parent_folder(folder, l):
     item.add_total_file_count(total_file_count)
 
 def look_into_the_folder(path, l, level):
-    p = Path(path)
-    find_folder(p, l, level)
-    if(level==1):
-        print("Search start: " + str(path))
+    try:
+        p = Path(path)
+        folder_found(p, l, level)
+        if(level==1):
+            print("Search start: " + str(path))
 
-    # recursive search
-    for file in p.iterdir():
-        if file.is_dir():
-            look_into_the_folder(file, l, level+1)
-        elif file.is_file():
-            find_file(file, l, level+1)
-    
-    # after search in this path
-    goto_parent_folder(p, l)
+        # recursive search
+        for file in p.iterdir():
+            if file.is_dir():
+                look_into_the_folder(file, l, level+1)
+            elif file.is_file():
+                file_found(file, l, level+1)
+        
+        # after search in this path
+        goto_parent_folder(p, l)
+    except Exception as e:
+        print("error: {e}, path: {path}".format(e=e, item=path))
 
 if __name__ == '__main__':
     # get args
