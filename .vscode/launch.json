@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["--path", "C:\\Users\\kppk0\\local_repos\\subdirectory", "--check_rule"]
+            "args": ["--path", "C:\\Users\\kppk0\\local_repos\\subdirectory"]
         }
     ]
 }

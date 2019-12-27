@@ -1,7 +1,14 @@
 # coding: utf-8
+'''
+subdirectory.py
+
+Copyright (c) 2019 Yuki Koizumi (copan31)
+
+This software is released under the MIT License.
+http://opensource.org/licenses/mit-license.php
+'''
 from pathlib import Path
 import argparse
-#import unicodecsv as csv
 import csv
 import datetime
 import re
@@ -115,7 +122,6 @@ if __name__ == '__main__':
     # get args
     parser = argparse.ArgumentParser(description="This program looks into the folder. And then, it outputs a csv file that include folder info and file info.")
     parser.add_argument("--path", help="Specify the path that you want to look into. If it's not specified, this program will look into the current path")
-    parser.add_argument("--check_rule", action='store_true')
     args = parser.parse_args()
 
     # set init path
@@ -126,7 +132,7 @@ if __name__ == '__main__':
         path=Path.cwd()
 
     # set check flag
-    Item.rule_check=args.check_rule
+    Item.rule_check=False
 
     # start search
     l={}
